@@ -38,8 +38,17 @@ class ChatRequest(BaseModel):
     prompt: str = Field(min_length=1, max_length=MAX_PROMPT_LENGTH)
 
 
+def _langfuse_tracing_enabled() -> bool:
+    return bool(
+        get_client
+        and os.getenv("LANGFUSE_PUBLIC_KEY")
+        and os.getenv("LANGFUSE_SECRET_KEY")
+        and os.getenv("LANGFUSE_TRACING_ENABLED", "true").lower() != "false"
+    )
+
+
 def _trace_span(name: str, input_data: dict[str, Any]) -> Any:
-    if get_client is None or not os.getenv("LANGFUSE_PUBLIC_KEY") or not os.getenv("LANGFUSE_SECRET_KEY"):
+    if not _langfuse_tracing_enabled():
         return nullcontext(None)
     try:
         return get_client().start_as_current_observation(
@@ -102,7 +111,7 @@ def create_app(
             "model": model,
             "embedding_model": embedding_model,
             "knowledge_base": request.app.state.knowledge_base.status(),
-            "tracing": bool(get_client and os.getenv("LANGFUSE_PUBLIC_KEY") and os.getenv("LANGFUSE_SECRET_KEY")),
+            "tracing": _langfuse_tracing_enabled(),
         }
 
     @app.post("/api/resume")

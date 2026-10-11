@@ -60,7 +60,8 @@ flowchart TD
 | `RESUME_KNOWLEDGE_DB` | `data/knowledge.sqlite3` | SQLite knowledge-base path |
 | `LANGFUSE_PUBLIC_KEY` | unset | Enables Langfuse tracing when used with the secret key |
 | `LANGFUSE_SECRET_KEY` | unset | Enables Langfuse tracing when used with the public key |
-| `LANGFUSE_HOST` | SDK default | Langfuse server URL, if self-hosted |
+| `LANGFUSE_BASE_URL` | SDK default | Langfuse server URL, for US Cloud or self-hosted projects |
+| `LANGFUSE_TRACING_ENABLED` | `true` | Set to `false` to disable SDK trace creation |
 | `LOG_LEVEL` | `INFO` | Python log level |
 
 Each chat response includes its retrieval similarity and threshold, whether it

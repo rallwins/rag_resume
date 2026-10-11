@@ -12,6 +12,22 @@ from rag_agent import SQLiteKnowledgeBase
 
 
 class AppTests(unittest.TestCase):
+    def test_status_reports_langfuse_sdk_tracing_switch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            app = create_app(knowledge_base_path=Path(directory) / "kb.sqlite3")
+            with patch.dict(
+                "os.environ",
+                {
+                    "LANGFUSE_PUBLIC_KEY": "public",
+                    "LANGFUSE_SECRET_KEY": "secret",
+                    "LANGFUSE_TRACING_ENABLED": "false",
+                },
+            ):
+                with TestClient(app) as client:
+                    status = client.get("/api/status").json()
+
+        self.assertFalse(status["tracing"])
+
     def test_architecture_page_is_served(self):
         with tempfile.TemporaryDirectory() as directory:
             with TestClient(create_app(knowledge_base_path=Path(directory) / "kb.sqlite3")) as client:
