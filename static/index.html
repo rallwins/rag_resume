@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f4ef">
+  <title>Resume Room</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f2f4ef;
+      --surface: #fbfcf9;
+      --ink: #202722;
+      --muted: #737d74;
+      --line: #dce2d9;
+      --green: #286b52;
+      --green-soft: #e3eee6;
+      --rust: #b66043;
+      --danger: #a63d32;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: var(--paper);
+      background-image: linear-gradient(rgba(57, 83, 62, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 83, 62, .025) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    button, textarea, input { font: inherit; }
+    button { cursor: pointer; }
+    .shell { min-height: 100vh; display: flex; flex-direction: column; }
+    header {
+      height: 72px; flex: 0 0 72px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; background: rgba(251, 252, 249, .92); border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; }
+    .brand-mark { display: grid; place-items: center; width: 34px; height: 34px; color: white; background: var(--green); border-radius: 9px; }
+    .brand-name { font-family: Georgia, serif; font-size: 19px; font-weight: 600; }
+    .header-meta { display: flex; align-items: center; gap: 22px; color: var(--muted); font-size: 12px; }
+    .local-tag { display: inline-flex; align-items: center; gap: 7px; text-transform: uppercase; }
+    .local-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+    .model { font-family: Consolas, monospace; }
+    main { width: min(1180px, 100%); flex: 1; margin: 0 auto; padding: 28px 24px 24px; display: grid; grid-template-columns: 292px minmax(0, 1fr); gap: 26px; }
+    aside { padding: 22px 0; border-right: 1px solid var(--line); padding-right: 24px; }
+    h1, h2, p { margin-top: 0; }
+    h1 { margin-bottom: 7px; font: 600 26px/1.2 Georgia, serif; }
+    .subhead { color: var(--muted); font-size: 13px; line-height: 1.55; margin-bottom: 25px; }
+    .section-label { color: var(--muted); font-size: 10px; letter-spacing: 0; text-transform: uppercase; font-weight: 700; margin: 0 0 10px; }
+    .drop-zone {
+      display: flex; min-height: 150px; align-items: center; justify-content: center; flex-direction: column; gap: 8px;
+      padding: 18px; text-align: center; background: var(--surface); border: 1px dashed #aebcaf; border-radius: 7px;
+      transition: border-color .16s, background .16s;
+    }
+    .drop-zone.over { border-color: var(--green); background: var(--green-soft); }
+    .drop-zone > div { display: grid; gap: 5px; }
+    .upload-icon { color: var(--green); }
+    .drop-title { font-size: 13px; font-weight: 650; }
+    .drop-note { color: var(--muted); font-size: 11px; }
+    .file-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+    .choose-file { color: var(--green); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    .resume-status { margin-top: 13px; min-height: 44px; color: var(--muted); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+    .resume-status.ready { color: var(--green); }
+    .resume-status.error { color: var(--danger); }
+    .divider { height: 1px; background: var(--line); margin: 22px 0; }
+    .privacy-note { display: flex; gap: 9px; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .privacy-note svg { flex: 0 0 16px; color: var(--green); }
+    .chat-panel { display: flex; min-width: 0; min-height: calc(100vh - 124px); flex-direction: column; }
+    .chat-heading { padding: 10px 0 18px; border-bottom: 1px solid var(--line); }
+    .chat-heading h2 { margin: 0 0 5px; font: 600 20px Georgia, serif; }
+    .chat-heading p { margin: 0; color: var(--muted); font-size: 12px; }
+    .messages { display: flex; flex: 1; flex-direction: column; align-items: stretch; gap: 21px; padding: 23px 0; }
+    .empty-state { margin: auto; max-width: 420px; text-align: center; animation: arrive .35s ease-out both; }
+    .empty-mark { display: grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 15px; color: var(--rust); background: #f5e9e1; border-radius: 14px; }
+    .empty-state h3 { margin: 0 0 7px; font: 600 19px Georgia, serif; }
+    .empty-state p { color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .message { display: flex; align-items: flex-start; gap: 10px; animation: arrive .22s ease-out both; }
+    .message.user { justify-content: flex-end; }
+    .bubble { max-width: min(660px, 88%); padding: 12px 15px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; line-height: 1.6; }
+    .assistant .bubble { background: var(--surface); border: 1px solid var(--line); border-radius: 3px 10px 10px; }
+    .user .bubble { color: white; background: var(--green); border-radius: 10px 3px 10px 10px; }
+    .bubble.pending { color: var(--muted); }
+    .bubble.error { color: var(--danger); border-color: #e5beb8; background: #fff8f6; }
+    .telemetry { max-width: min(660px, 88%); margin: -13px 0 0 35px; color: var(--muted); font: 10px/1.8 Consolas, monospace; }
+    .telemetry span { display: inline-block; margin-right: 12px; }
+    .telemetry .grounded { color: var(--green); }
+    .telemetry .refused { color: var(--rust); }
+    .composer-wrap { padding-top: 12px; border-top: 1px solid var(--line); }
+    .composer { display: flex; align-items: flex-end; gap: 10px; padding: 9px; border: 1px solid #cfd8cf; border-radius: 9px; background: var(--surface); }
+    textarea { flex: 1; min-width: 0; min-height: 42px; max-height: 150px; resize: none; padding: 10px 8px; border: 0; outline: 0; color: var(--ink); background: transparent; line-height: 1.5; }
+    textarea::placeholder { color: #929c92; }
+    .send { display: grid; place-items: center; width: 40px; height: 40px; color: white; background: var(--green); border: 0; border-radius: 7px; }
+    .send:disabled { cursor: wait; opacity: .55; }
+    .composer-foot { display: flex; justify-content: space-between; gap: 12px; padding: 8px 3px 0; color: var(--muted); font-size: 10px; }
+    .clear-chat { color: var(--muted); background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 2px; }
+    [hidden] { display: none !important; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 720px) {
+      header { height: 62px; flex-basis: 62px; padding: 0 16px; }
+      .header-meta { gap: 11px; }
+      .model { max-width: 135px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      main { display: flex; flex-direction: column; gap: 12px; padding: 16px 16px 12px; }
+      aside { padding: 4px 0 16px; border: 0; border-bottom: 1px solid var(--line); }
+      h1 { font-size: 22px; }
+      .subhead { margin-bottom: 13px; }
+      .drop-zone { min-height: 94px; flex-direction: row; justify-content: flex-start; text-align: left; }
+      .drop-zone > div { display: grid; gap: 4px; }
+      .upload-icon { margin-right: 2px; }
+      .divider, .privacy-note { display: none; }
+      .resume-status { min-height: 0; margin-top: 8px; }
+      .chat-panel { min-height: 55vh; }
+      .chat-heading { padding: 7px 0 13px; }
+      .messages { min-height: 190px; }
+      .empty-state { padding: 20px 0; }
+      .composer-foot { font-size: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><span class="brand-mark" aria-hidden="true">R</span><span class="brand-name">Resume Room</span></div>
+      <div class="header-meta"><span class="local-tag"><span class="local-dot"></span>Local session</span><span class="model" id="model-label">Ollama connecting</span></div>
+    </header>
+    <main>
+      <aside>
+        <h1>Your resume</h1>
+        <p class="subhead">Add one resume to the knowledge base.</p>
+        <p class="section-label">Knowledge base</p>
+        <form id="upload-form">
+          <input class="file-input" id="resume-file" name="file" type="file" accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown">
+          <label class="drop-zone" id="drop-zone" for="resume-file">
+            <svg class="upload-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg>
+            <div><span class="drop-title">Drop a resume or <span class="choose-file">browse</span></span><span class="drop-note">PDF, TXT, or MD · up to 10 MB</span></div>
+          </label>
+        </form>
+        <div class="resume-status" id="resume-status" aria-live="polite">No resume indexed</div>
+        <div class="divider"></div>
+        <div class="privacy-note">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3m-4 5v2"/></svg>
+          <span>Resume text stays in your local knowledge base. Langfuse traces record usage and retrieval scores, not resume content.</span>
+        </div>
+      </aside>
+      <section class="chat-panel" aria-label="Resume chat">
+        <div class="chat-heading"><h2>Ask about your experience</h2><p>Answers are grounded in the indexed resume.</p></div>
+        <div class="messages" id="messages" aria-live="polite">
+          <div class="empty-state" id="empty-state">
+            <div class="empty-mark" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15M8 7h8M8 11h6"/></svg>
+            </div>
+            <h3>Start with the source</h3>
+            <p>Upload a resume to begin a focused conversation about roles, projects, skills, and experience.</p>
+          </div>
+        </div>
+        <div class="composer-wrap">
+          <form class="composer" id="chat-form">
+            <textarea id="prompt" rows="1" maxlength="4000" aria-label="Your question" placeholder="Upload a resume to ask a question…" disabled required></textarea>
+            <button class="send" id="send" type="submit" aria-label="Send question" disabled>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 14-7-4 14-3-6zM12 13l7-8"/></svg>
+            </button>
+          </form>
+          <div class="composer-foot"><span>Ollama · resume-only retrieval</span><button class="clear-chat" id="clear-chat" type="button">Clear conversation</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+    const uploadForm = document.querySelector("#upload-form");
+    const fileInput = document.querySelector("#resume-file");
+    const dropZone = document.querySelector("#drop-zone");
+    const resumeStatus = document.querySelector("#resume-status");
+    const form = document.querySelector("#chat-form");
+    const input = document.querySelector("#prompt");
+    const messages = document.querySelector("#messages");
+    const emptyState = document.querySelector("#empty-state");
+    const send = document.querySelector("#send");
+    let busy = false;
+
+    function setResumeStatus(text, state = "") {
+      resumeStatus.textContent = text;
+      resumeStatus.className = `resume-status${state ? ` ${state}` : ""}`;
+      const ready = state === "ready";
+      input.disabled = !ready;
+      send.disabled = !ready || busy;
+      input.placeholder = ready ? "Ask about a role, project, or skill…" : "Upload a resume to ask a question…";
+    }
+
+    function addMessage(role, text, className = "") {
+      const row = document.createElement("div");
+      row.className = `message ${role}`;
+      const bubble = document.createElement("div");
+      bubble.className = `bubble ${className}`.trim();
+      bubble.textContent = text;
+      row.append(bubble);
+      messages.append(row);
+      row.scrollIntoView({ behavior: "smooth", block: "end" });
+      return bubble;
+    }
+
+    function addTelemetry(result) {
+      const line = document.createElement("div");
+      line.className = "telemetry";
+      const grounded = result.retrieval.grounded;
+      const details = [
+        [`${grounded ? "Grounded" : "Outside evidence"}`, grounded ? "grounded" : "refused"],
+        [`similarity ${result.retrieval.top_similarity.toFixed(3)} / ${result.retrieval.threshold.toFixed(3)}`],
+        [`${result.usage.prompt_tokens} prompt tokens`],
+        [`${result.usage.completion_tokens} completion tokens`],
+        [`${result.timings.total_ms} ms`],
+        [`${result.timings.tokens_per_second} tok/s`],
+      ];
+      for (const [text, className = ""] of details) {
+        const item = document.createElement("span");
+        item.textContent = text;
+        if (className) item.className = className;
+        line.append(item);
+      }
+      if (result.retrieval.matches.length) {
+        const sources = document.createElement("span");
+        sources.textContent = `source: ${result.retrieval.matches.map(match => match.source).join(", ")}`;
+        line.append(sources);
+      }
+      line.title = `Request ${result.request_id}; generation ${result.timings.generation_ms} ms; prompt evaluation ${result.timings.prompt_eval_ms} ms`;
+      messages.append(line);
+    }
+
+    async function uploadFile(file) {
+      if (!file) return;
+      setResumeStatus(`Indexing ${file.name}…`);
+      const data = new FormData();
+      data.append("file", file);
+      try {
+        const response = await fetch("/api/resume", { method: "POST", body: data });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.detail || "Resume upload failed.");
+        setResumeStatus(`${result.filename} · ${result.chunks} chunks · indexed in ${result.elapsed_ms} ms`, "ready");
+        input.focus();
+      } catch (error) {
+        setResumeStatus(error.message, "error");
+      } finally {
+        fileInput.value = "";
+      }
+    }
+
+    uploadForm.addEventListener("submit", event => event.preventDefault());
+    fileInput.addEventListener("change", () => uploadFile(fileInput.files[0]));
+    for (const eventName of ["dragenter", "dragover"]) dropZone.addEventListener(eventName, event => { event.preventDefault(); dropZone.classList.add("over"); });
+    for (const eventName of ["dragleave", "drop"]) dropZone.addEventListener(eventName, event => { event.preventDefault(); dropZone.classList.remove("over"); });
+    dropZone.addEventListener("drop", event => uploadFile(event.dataTransfer.files[0]));
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      const prompt = input.value.trim();
+      if (!prompt || busy) return;
+      busy = true;
+      send.disabled = true;
+      emptyState.hidden = true;
+      addMessage("user", prompt);
+      input.value = "";
+      input.style.height = "42px";
+      const pending = addMessage("assistant", "Checking the resume evidence…", "pending");
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.detail || "The request failed.");
+        pending.classList.remove("pending");
+        pending.textContent = result.answer;
+        addTelemetry(result);
+      } catch (error) {
+        pending.classList.remove("pending");
+        pending.classList.add("error");
+        pending.textContent = error.message;
+      } finally {
+        busy = false;
+        send.disabled = input.disabled;
+        input.focus();
+      }
+    });
+    input.addEventListener("input", () => {
+      input.style.height = "42px";
+      input.style.height = `${Math.min(input.scrollHeight, 150)}px`;
+    });
+    input.addEventListener("keydown", event => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        form.requestSubmit();
+      }
+    });
+    document.querySelector("#clear-chat").addEventListener("click", () => {
+      for (const node of [...messages.children]) if (node !== emptyState) node.remove();
+      emptyState.hidden = false;
+      input.focus();
+    });
+    fetch("/api/status").then(response => response.json()).then(result => {
+      document.querySelector("#model-label").textContent = `Ollama · ${result.model}`;
+      if (result.knowledge_base.uploaded) {
+        setResumeStatus(`${result.knowledge_base.source} · ${result.knowledge_base.chunks} chunks indexed`, "ready");
+      }
+    }).catch(() => { document.querySelector("#model-label").textContent = "Backend unavailable"; });
+  </script>
+</body>
+</html>
