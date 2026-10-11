@@ -96,6 +96,7 @@
     .send { display: grid; place-items: center; width: 40px; height: 40px; color: white; background: var(--green); border: 0; border-radius: 7px; }
     .send:disabled { cursor: wait; opacity: .55; }
     .composer-foot { display: flex; justify-content: space-between; gap: 12px; padding: 8px 3px 0; color: var(--muted); font-size: 10px; }
+    .architecture-link { color: var(--green); text-underline-offset: 2px; }
     .clear-chat { color: var(--muted); background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 2px; }
     [hidden] { display: none !important; }
     @keyframes arrive { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -164,7 +165,7 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 14-7-4 14-3-6zM12 13l7-8"/></svg>
             </button>
           </form>
-          <div class="composer-foot"><span>Ollama · resume-only retrieval</span><button class="clear-chat" id="clear-chat" type="button">Clear conversation</button></div>
+          <div class="composer-foot"><span>Ollama · resume-only retrieval · <a class="architecture-link" href="/architecture">Architecture</a></span><button class="clear-chat" id="clear-chat" type="button">Clear conversation</button></div>
         </div>
       </section>
     </main>

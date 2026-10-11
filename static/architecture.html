@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f4ef">
+  <title>Architecture · Resume Room</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f2f4ef;
+      --surface: #fbfcf9;
+      --ink: #202722;
+      --muted: #737d74;
+      --line: #dce2d9;
+      --green: #286b52;
+      --green-pale: #e9f1e9;
+      --rust: #b66043;
+      --rust-pale: #f7ece5;
+      --gold: #aa8137;
+      --gold-pale: #f7f1df;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background-image: linear-gradient(rgba(57, 83, 62, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 83, 62, .025) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    a { color: inherit; }
+    header {
+      position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between;
+      min-height: 68px; padding: 0 30px; border-bottom: 1px solid var(--line); background: rgba(251, 252, 249, .94);
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; text-decoration: none; }
+    .brand-mark { display: grid; place-items: center; width: 33px; height: 33px; color: #fff; background: var(--green); border-radius: 8px; }
+    .brand-name { font: 600 18px Georgia, serif; }
+    .back-link { padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; color: var(--green); background: var(--surface); font-size: 12px; text-decoration: none; }
+    .back-link:hover { border-color: var(--green); }
+    main { width: min(1210px, 100%); margin: 0 auto; padding: 48px 28px 64px; }
+    .eyebrow { margin: 0 0 10px; color: var(--rust); font: 700 11px Consolas, monospace; text-transform: uppercase; }
+    h1 { margin: 0; font: 600 38px/1.12 Georgia, serif; }
+    .lede { max-width: 760px; margin: 13px 0 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .legend { display: flex; flex-wrap: wrap; gap: 9px 22px; margin: 22px 0 32px; color: var(--muted); font-size: 11px; }
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .swatch { width: 9px; height: 9px; border-radius: 2px; }
+    .swatch.local { background: var(--green); }
+    .swatch.storage { background: var(--gold); }
+    .swatch.guard { background: var(--rust); }
+    .flows { display: grid; grid-template-columns: minmax(0, 1fr) 255px; gap: 22px; align-items: stretch; }
+    .flow-column { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
+    .flow { position: relative; display: flex; flex-direction: column; align-items: center; min-width: 0; padding: 25px 20px 22px; border: 1px dashed #bac7b9; border-radius: 8px; background: rgba(251, 252, 249, .72); }
+    .flow-label { position: absolute; top: -9px; left: 15px; padding: 2px 8px; color: var(--green); background: var(--paper); font: 700 10px Consolas, monospace; text-transform: uppercase; }
+    .node { width: min(100%, 620px); padding: 13px 17px; border: 1px solid var(--line); border-radius: 6px; text-align: center; background: var(--surface); }
+    .node strong { display: block; font-size: 13px; }
+    .node p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .node.local { border-color: #b9d0bd; background: var(--green-pale); }
+    .node.storage { border-color: #dfcf9d; background: var(--gold-pale); }
+    .node.guard { border-color: #dfbdad; background: var(--rust-pale); }
+    .connector { position: relative; display: grid; place-items: center; width: 100%; height: 40px; color: var(--muted); }
+    .connector::before { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: #bfc9bd; content: ""; }
+    .connector::after { position: absolute; bottom: 2px; left: calc(50% - 4px); width: 7px; height: 7px; border-right: 1px solid var(--green); border-bottom: 1px solid var(--green); transform: rotate(45deg); content: ""; }
+    .connector span { position: relative; z-index: 1; padding: 3px 8px; border: 1px solid var(--line); border-radius: 3px; color: #657067; background: var(--surface); font: 10px Consolas, monospace; }
+    .fork { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: min(100%, 620px); }
+    .fork .node { width: auto; }
+    .notes { display: flex; flex-direction: column; gap: 11px; }
+    .note { padding: 15px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+    .note h2 { margin: 0 0 7px; font: 600 14px Georgia, serif; }
+    .note p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .note.local { border-color: #b9d0bd; background: #f0f5ef; }
+    .note.guard { border-color: #dfbdad; background: #fbf2ec; }
+    .note.trace { border-color: #dfcf9d; background: #faf6e9; }
+    .telemetry { margin-top: 31px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .telemetry-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 13px; }
+    .telemetry h2 { margin: 0; font: 600 20px Georgia, serif; }
+    .telemetry-head p { max-width: 520px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+    .metric { min-height: 82px; padding: 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+    .metric strong { display: block; color: var(--green); font: 700 10px Consolas, monospace; }
+    .metric span { display: block; margin-top: 6px; color: var(--muted); font-size: 10px; line-height: 1.45; }
+    .footnote { margin: 13px 0 0; color: #828b81; font-size: 10px; line-height: 1.6; }
+    @media (max-width: 840px) {
+      main { padding: 38px 20px 48px; }
+      .flows { grid-template-columns: 1fr; }
+      .notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      header { min-height: 60px; padding: 0 15px; }
+      main { padding: 30px 15px 40px; }
+      h1 { font-size: 31px; }
+      .lede { font-size: 13px; }
+      .flow { padding: 22px 12px 16px; }
+      .node { padding: 12px; }
+      .fork { grid-template-columns: 1fr; }
+      .notes, .metrics { grid-template-columns: 1fr; }
+      .telemetry-head { display: block; }
+      .telemetry-head p { margin-top: 7px; }
+      .metric { min-height: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">R</span><span class="brand-name">Resume Room</span></a>
+    <a class="back-link" href="/">Back to chat</a>
+  </header>
+  <main>
+    <p class="eyebrow">System flow · local RAG</p>
+    <h1>How Resume Room works</h1>
+    <p class="lede">A resume is indexed into a local knowledge base. Questions retrieve relevant passages first; only evidence above the similarity threshold is sent to the Ollama answer model.</p>
+    <div class="legend" aria-label="Diagram legend">
+      <span><i class="swatch local"></i>Local app and Ollama</span>
+      <span><i class="swatch storage"></i>Knowledge base and telemetry</span>
+      <span><i class="swatch guard"></i>Grounding and refusal gate</span>
+    </div>
+
+    <section class="flows" aria-label="Resume indexing and question answering architecture">
+      <div class="flow-column">
+        <section class="flow" aria-label="Resume indexing flow">
+          <span class="flow-label">A · resume indexing · on upload</span>
+          <article class="node"><strong>1 · Upload a resume</strong><p>Browser sends a PDF, TXT, or MD file to FastAPI · 10 MB maximum.</p></article>
+          <div class="connector"><span>multipart upload</span></div>
+          <article class="node local"><strong>2 · Extract and chunk text</strong><p>PDF text extraction or UTF-8 decoding, followed by overlapping chunks.</p></article>
+          <div class="connector"><span>resume chunks</span></div>
+          <article class="node local"><strong>3 · Ollama creates embeddings</strong><p><code>nomic-embed-text</code> maps each chunk to a vector on the local Ollama server.</p></article>
+          <div class="connector"><span>chunk + vector</span></div>
+          <article class="node storage"><strong>4 · SQLite knowledge base</strong><p>Chunks, source filename, and vectors replace the previously active resume.</p></article>
+        </section>
+
+        <section class="flow" aria-label="Question answering flow">
+          <span class="flow-label">B · question answering · each chat turn</span>
+          <article class="node"><strong>1 · Ask about the resume</strong><p>The browser sends the question to FastAPI; chat is disabled until a resume is indexed.</p></article>
+          <div class="connector"><span>question</span></div>
+          <article class="node local"><strong>2 · Embed the question</strong><p>The same embedding model represents the query for comparison with stored chunks.</p></article>
+          <div class="connector"><span>cosine similarity</span></div>
+          <article class="node storage"><strong>3 · Retrieve the closest passages</strong><p>SQLite vectors are ranked; the best score is checked against <code>RAG_MIN_SIMILARITY</code>.</p></article>
+          <div class="connector"><span>threshold decision</span></div>
+          <div class="fork">
+            <article class="node guard"><strong>Below threshold · refuse</strong><p>Return a fixed out-of-scope response. The answer model is not called.</p></article>
+            <article class="node local"><strong>Evidence found · generate</strong><p>Pass matching resume text to the local answer model with resume-only instructions.</p></article>
+          </div>
+          <div class="connector"><span>answer + source</span></div>
+          <article class="node"><strong>4 · Return answer and diagnostics</strong><p>Browser displays the answer, grounding score, token counts, latency, throughput, and source.</p></article>
+        </section>
+      </div>
+
+      <aside class="notes" aria-label="Privacy and safety properties">
+        <article class="note local">
+          <h2>Local inference</h2>
+          <p>Embeddings and answer generation use Ollama. The app binds to localhost by default.</p>
+        </article>
+        <article class="note guard">
+          <h2>Evidence gate</h2>
+          <p>Weak retrieval is refused before generation. The model is instructed to use only supplied resume passages.</p>
+        </article>
+        <article class="note trace">
+          <h2>Metadata-only tracing</h2>
+          <p>When configured, Langfuse receives grounding status, similarity, token usage, and timings, not resume text or the raw question.</p>
+        </article>
+      </aside>
+    </section>
+
+    <section class="telemetry" aria-labelledby="telemetry-title">
+      <div class="telemetry-head">
+        <h2 id="telemetry-title">What each answer reports</h2>
+        <p>Request logs and the chat response expose diagnostics for inspection. Similarity is a retrieval signal, not a statistical precision score.</p>
+      </div>
+      <div class="metrics">
+        <article class="metric"><strong>RETRIEVAL</strong><span>Top cosine similarity, configured threshold, grounding state, and matched source.</span></article>
+        <article class="metric"><strong>TOKEN USAGE</strong><span>Prompt, completion, and total tokens reported by Ollama.</span></article>
+        <article class="metric"><strong>LATENCY</strong><span>Prompt evaluation, generation, and total request time.</span></article>
+        <article class="metric"><strong>THROUGHPUT</strong><span>Generated tokens per second plus a request ID for log correlation.</span></article>
+      </div>
+      <p class="footnote">The retrieval threshold and prompt instructions are defense in depth, not a guarantee against all prompt injection. Review answers before relying on them for high-impact decisions.</p>
+    </section>
+  </main>
+</body>
+</html>

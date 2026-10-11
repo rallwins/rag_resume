@@ -12,6 +12,16 @@ from rag_agent import SQLiteKnowledgeBase
 
 
 class AppTests(unittest.TestCase):
+    def test_architecture_page_is_served(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with TestClient(create_app(knowledge_base_path=Path(directory) / "kb.sqlite3")) as client:
+                response = client.get("/architecture")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("How Resume Room works", response.text)
+        self.assertIn("Below threshold · refuse", response.text)
+        self.assertIn("Metadata-only tracing", response.text)
+
     def test_chat_requires_an_uploaded_resume(self):
         with tempfile.TemporaryDirectory() as directory:
             with TestClient(create_app(knowledge_base_path=Path(directory) / "kb.sqlite3")) as client:

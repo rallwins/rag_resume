@@ -29,4 +29,4 @@ testpaths = ["tests"]
 py-modules = ["app", "rag_agent"]
 
 [tool.setuptools.data-files]
-"share/rag-resume/static" = ["static/index.html"]
+"share/rag-resume/static" = ["static/index.html", "static/architecture.html"]

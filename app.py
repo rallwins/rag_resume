@@ -5,6 +5,7 @@ import asyncio
 from contextlib import asynccontextmanager, nullcontext
 import logging
 import os
+from sysconfig import get_path
 import time
 from io import BytesIO
 from pathlib import Path
@@ -81,11 +82,19 @@ def create_app(
         yield
 
     app = FastAPI(title="Resume Chat", lifespan=lifespan)
-    index_file = Path(__file__).parent / "static" / "index.html"
+    static_directory = Path(__file__).parent / "static"
+    if not static_directory.is_dir():
+        static_directory = Path(get_path("data")) / "share" / "rag-resume" / "static"
+    index_file = static_directory / "index.html"
+    architecture_file = static_directory / "architecture.html"
 
     @app.get("/", include_in_schema=False)
     async def home() -> FileResponse:
         return FileResponse(index_file)
+
+    @app.get("/architecture", include_in_schema=False)
+    async def architecture() -> FileResponse:
+        return FileResponse(architecture_file)
 
     @app.get("/api/status")
     async def status(request: Request) -> dict[str, Any]:

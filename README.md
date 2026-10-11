@@ -27,6 +27,29 @@ question. The SQLite knowledge base is stored under `data/knowledge.sqlite3`.
 The app binds to localhost by default and stores extracted resume chunks and
 embeddings locally; it does not retain the original upload.
 
+## Architecture
+
+Open the [architecture page](static/architecture.html) in the project or visit
+`http://127.0.0.1:8000/architecture` while the chatbot is running. It diagrams
+resume indexing separately from question answering, including the retrieval
+threshold refusal path and metadata-only Langfuse diagnostics.
+
+```mermaid
+flowchart TD
+	A[Resume upload] --> B[Extract and chunk text]
+	B --> C[Ollama embedding model]
+	C --> D[(SQLite knowledge base)]
+	E[Question] --> F[Embed question]
+	F --> G[Rank resume chunks]
+	D --> G
+	G --> H{Similarity threshold met?}
+	H -->|No| I[Fixed refusal]
+	H -->|Yes| J[Ollama answer model with retrieved evidence]
+	J --> K[Answer, source, usage and timing details]
+	G -. metadata only .-> L[Optional Langfuse trace]
+	J -. metadata only .-> L
+```
+
 ## Configuration
 
 | Variable | Default | Purpose |
